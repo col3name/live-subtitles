@@ -4,6 +4,9 @@ On-device speech recognition for videos in Telegram. Watch videos with synchroni
 
 This is an experimental integration into Telegram-iOS  powered by [TinyASR](https://github.com/dkaraush/tinyasr). Speech recognition runs locally on the device, without a separate backend or cloud transcription API.
 
+[Video Demo](live-subtitles-demo.mp4)
+
+<img src="demo.png"  width=60% />
 ## Features
 
 | | Video Player | Stories Editor | Video Send Editor |
