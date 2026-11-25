@@ -44730,7 +44730,7 @@ index 0adc6e199b..61c40a0e57 100644
 2.44.0
 
 
-From 212131d24a627a3ca5e86aa6d7e709fa7aa51049 Mon Sep 17 00:00:00 2001
+From f72c6d91e2465f23fa3e9f51b84209c19bd60b67 Mon Sep 17 00:00:00 2001
 From: col3name <mmikushov@instaloper.com>
 Date: Wed, 25 Nov 2026 18:05:50 +0300
 Subject: [PATCH 18/18] fix: crash after restrict camera permissions
@@ -44738,8 +44738,9 @@ Subject: [PATCH 18/18] fix: crash after restrict camera permissions
 ---
  .../CameraLegacy/Sources/LegacyCamera.swift   | 61 +++++++++++++++++--
  .../Camera/CameraNeo/Sources/CameraNeo.swift  | 43 +++++++++++--
+ .../DrawingUI/Sources/DrawingScreen.swift     | 32 ++++++----
  .../Sources/EditorCaptionsScreen.swift        |  4 +-
- 3 files changed, 98 insertions(+), 10 deletions(-)
+ 4 files changed, 119 insertions(+), 21 deletions(-)
 
 diff --git a/submodules/Camera/CameraLegacy/Sources/LegacyCamera.swift b/submodules/Camera/CameraLegacy/Sources/LegacyCamera.swift
 index d10ee65718..d10da24995 100644
@@ -44973,6 +44974,126 @@ index 72c7778c2d..3c3ad3364b 100644
          }
      }
  }
+diff --git a/submodules/DrawingUI/Sources/DrawingScreen.swift b/submodules/DrawingUI/Sources/DrawingScreen.swift
+index 3c2794de6e..03a4c999dd 100644
+--- a/submodules/DrawingUI/Sources/DrawingScreen.swift
++++ b/submodules/DrawingUI/Sources/DrawingScreen.swift
+@@ -1287,6 +1287,16 @@ private final class DrawingScreenComponent: CombinedComponent {
+                 controlsAreVisible = false
+             }
+                              
++            // Chat native text accessory owns bottom formatting controls.
++            // Keep the size slider and top Cancel/Done buttons independent.
++            var bottomFormattingControlsAreVisible = controlsAreVisible
++            if component.sourceHint == .chatMediaEditor,
++               let textEntity = state.selectedEntity as? DrawingTextEntity,
++               let entityView = component.entityViewForEntity(textEntity) as? DrawingTextEntityView,
++               entityView.isEditing {
++                bottomFormattingControlsAreVisible = false
++            }
++
+             var controlsBottomInset: CGFloat = 0.0
+             let previewSize: CGSize
+             var previewTopInset: CGFloat = environment.statusBarHeight + 5.0
+@@ -1492,7 +1502,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                             completion()
+                         }
+                     }))
+-                    .opacity(controlsAreVisible ? 1.0 : 0.0)
++                    .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+                 )
+             }
+             
+@@ -1540,7 +1550,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             offsetX += delta
+         
+@@ -1568,7 +1578,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             offsetX += delta
+             
+@@ -1596,7 +1606,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             offsetX += delta
+             
+@@ -1624,7 +1634,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             offsetX += delta
+             
+@@ -1652,7 +1662,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             offsetX += delta
+             delay += 0.025
+@@ -1681,7 +1691,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             offsetX += delta
+             
+@@ -1709,7 +1719,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             offsetX += delta
+             
+@@ -1737,7 +1747,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                         completion()
+                     })
+                 })
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+          
+             if state.selectedEntity is DrawingStickerEntity || state.selectedEntity is DrawingTextEntity {
+@@ -2158,7 +2168,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                 .position(CGPoint(x: leftEdge + colorButton.size.width / 2.0 + 6.0, y: context.availableSize.height - environment.safeInsets.bottom - colorButton.size.height / 2.0 - 89.0 - additionalBottomInset))
+                 .appear(.default(scale: true))
+                 .disappear(.default(scale: true))
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+       
+             let modeRightInset: CGFloat = 57.0
+@@ -2208,7 +2218,7 @@ private final class DrawingScreenComponent: CombinedComponent {
+                 .appear(.default(scale: true))
+                 .disappear(.default(scale: true))
+                 .cornerRadius(12.0)
+-                .opacity(controlsAreVisible ? 1.0 : 0.0)
++                .opacity(bottomFormattingControlsAreVisible ? 1.0 : 0.0)
+             )
+             
+             if !drawingScreenSkipsBottomControls(sourceHint: component.sourceHint, externalControls: component.externalControls) {
 diff --git a/submodules/TelegramUI/Components/MediaEditorScreen/Sources/EditorCaptionsScreen.swift b/submodules/TelegramUI/Components/MediaEditorScreen/Sources/EditorCaptionsScreen.swift
 index a4f310ff3c..d32e74b98e 100644
 --- a/submodules/TelegramUI/Components/MediaEditorScreen/Sources/EditorCaptionsScreen.swift
