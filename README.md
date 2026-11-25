@@ -2,7 +2,7 @@
 
 On-device speech recognition for videos in Telegram. Watch videos with synchronized captions, create subtitled Stories, and add editable captions to videos before sending them in a chat.
 
-This is an experimental integration into Telegram-iOS (`feature/live-caption`), powered by [TinyASR](https://github.com/dkaraush/tinyasr). Speech recognition runs locally on the device, without a separate backend or cloud transcription API.
+This is an experimental integration into Telegram-iOS  powered by [TinyASR](https://github.com/dkaraush/tinyasr). Speech recognition runs locally on the device, without a separate backend or cloud transcription API.
 
 ## Features
 
